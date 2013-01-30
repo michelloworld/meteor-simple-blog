@@ -1,0 +1,38 @@
+<head>
+  <title>blog</title>
+</head>
+
+<body>
+  {{renderPage}}
+</body>
+
+<template name="home">
+	This is home <a href="#" class="postCreateBtn">Create Post</a>
+	<br><br>
+	<ul>
+		{{#each posts}}
+			<li><a href="/posts/{{_id}}" class="postView">{{title}}</a></li>
+		{{/each}}
+
+	</ul>
+</template>
+
+<template name="postCreate">
+  <form>
+  	<label>Title: </label>
+  	<input type="text" id="title">
+  	<br>
+
+  	<label>Message: </label>
+  	<textarea id="message"></textarea>
+  	<br>
+
+  	<input type="submit" value="Submit">
+  </form>
+</template>
+
+<template name="postView">
+  <h1>{{post.title}}</h1>
+  <div>{{post.message}}</div>
+</template>
+

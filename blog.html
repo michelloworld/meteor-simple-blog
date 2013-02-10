@@ -3,17 +3,27 @@
 </head>
 
 <body>
+  {{loginButtons}}
+  <br><br>
+
   {{renderPage}}
 </body>
 
 <template name="home">
-	This is home <a href="#" class="postCreateBtn">Create Post</a>
-	<br><br>
-	<ul>
-		{{#each posts}}
-			<li><a href="/posts/{{_id}}" class="postView">{{title}}</a></li>
-		{{/each}}
+  {{#if currentUser}}
+  	This is home <a href="#" class="postCreateBtn">Create Post</a>
+  	<br><br>
+  {{/if}}
 
+	<ul>
+		{{#each data.posts}}
+			<li>
+        <img src="{{avatar currentUser._id}}">
+        <a href="/posts/{{_id}}" class="postView">{{title}}</a> 
+        by 
+        <span>{{user.profile.name}}</span>
+      </li>
+		{{/each}}
 	</ul>
 </template>
 
@@ -33,6 +43,7 @@
 
 <template name="postView">
   <h1>{{post.title}}</h1>
-  <div>{{post.message}}</div>
+  <p>by {{post.user.profile.name}}</p>
+  <div>11{{post.message}}</div>
 </template>
 

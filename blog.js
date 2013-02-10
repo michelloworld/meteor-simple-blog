@@ -1,6 +1,16 @@
+
 Posts = new Meteor.Collection('posts');
 
 if (Meteor.isClient) {
+
+  Handlebars.registerHelper("debug", function(optionalValue) { 
+    if (optionalValue) {
+      console.log("Value");
+      console.log("====================");
+      console.log(optionalValue);
+    }
+  });
+
   Meteor.Router.add({
     '/': function() {
       Template.home.events({
@@ -14,18 +24,40 @@ if (Meteor.isClient) {
         }
       });
 
-      Template.home.posts = function() {
-        return Posts.find();
+      Template.home.data = function() {
+        return {
+          posts: Posts.find(), 
+          user: Meteor.users.findOne({_id: Meteor.userId()})
+        };
+      }
+
+      // helper
+      Template.home.avatar = function(userId) {
+        Meteor.autosubscribe(function() {
+          Meteor.subscribe('users', userId);
+        });
+
+        user = Meteor.users.findOne({_id: userId});
+        avatar = '';
+        if(user.services) {
+          avatar = get_avatar_from_service('google', user.services.google.id, 70);
+        }
+        
+        return avatar;
       }
 
       return 'home';
     },
 
     '/posts/create': function() {
+      if(Meteor.user() == null) {
+        Meteor.Router.to('/');
+      }
+
       Template.postCreate.events({
         'submit form': function(e) {
           e.preventDefault();
-          Posts.insert({title: $('#title').val(), message: $('#message').val()});
+          Posts.insert({title: $('#title').val(), message: $('#message').val(), user: Meteor.user()});
           Meteor.Router.to('/');
         }
       });
@@ -44,8 +76,15 @@ if (Meteor.isClient) {
 
 }
 
-/*if (Meteor.isServer) {
+if (Meteor.isServer) {
   Meteor.startup(function () {
-    // code to run on server at startup
+    Meteor.publish('users', function(userId) {
+      user = Meteor.users.find({_id: userId}, {fields: {
+        createdAt: 1,
+        profile: 1,
+        services: 1
+      }});
+      return user;
+    });
   });
-}*/
+}
